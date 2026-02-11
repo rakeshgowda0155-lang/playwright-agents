@@ -5,8 +5,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Student Management - Add Students Suite', () => {
   test('Add Student - Valid Student with Subjects and Marks', async ({ page }) => {
-    // Generate unique roll number for this test run
+    // Generate unique identifiers for this test run
     const uniqueRollNumber = `STU${Date.now().toString().slice(-6)}`;
+    const uniqueSubjectName = `Math${Date.now().toString().slice(-6)}`;
+    const uniqueSubjectCode = `MATH${Date.now().toString().slice(-4)}`;
     
     // 1. Navigate to the application and login with valid credentials (jane.doe@example.com / Test@1234)
     await page.goto('https://student-tracker-new.vercel.app/');
@@ -17,11 +19,14 @@ test.describe('Student Management - Add Students Suite', () => {
     // Expect: User is logged in and dashboard is displayed
     await expect(page.getByRole('heading', { name: 'Dashboard Overview' })).toBeVisible();
     
-    // 2. Make sure at least one subject exists (add 'Mathematics' if needed)
+    // 2. Create a subject for student enrollment
     await page.getByRole('link', { name: 'Subjects' }).click();
+    await page.getByRole('textbox', { name: 'Subject Name *' }).fill(uniqueSubjectName);
+    await page.getByRole('textbox', { name: 'Subject Code (Optional)' }).fill(uniqueSubjectCode);
+    await page.getByRole('button', { name: 'Add Subject' }).click();
     
-    // Expect: Subject is available for student enrollment
-    await expect(page.getByText('Mathematics')).toBeVisible();
+    // Expect: Subject is created and available for student enrollment
+    await expect(page.getByText(uniqueSubjectName).first()).toBeVisible();
     
     // 3. Navigate to the Students section by clicking 'Students' in the sidebar
     await page.getByRole('link', { name: 'Students' }).click();
@@ -61,8 +66,9 @@ test.describe('Student Management - Add Students Suite', () => {
     // Expect: Password is entered (masked)
     await expect(page.getByRole('textbox', { name: 'Password *', exact: true })).toHaveValue('Pass@1234');
     
-    // 8. Select a subject (e.g., 'Mathematics') and enter marks (e.g., '85')
-    await page.getByLabel('Subject Name *').selectOption(['Mathematics (MATH101)']);
+    // 8. Select the subject created earlier and enter marks (e.g., '85')
+    const subjectOption = `${uniqueSubjectName} (${uniqueSubjectCode})`;
+    await page.getByLabel('Subject Name *').selectOption([subjectOption]);
     await page.getByRole('spinbutton', { name: 'Marks (0-100) *' }).fill('85');
     
     // Expect: Subject is selected

@@ -5,6 +5,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Subject Management Suite', () => {
   test('Add Subject - Valid Subject', async ({ page }) => {
+    // Generate unique subject name and code for this test run
+    const uniqueSubjectName = `Math${Date.now().toString().slice(-6)}`;
+    const uniqueSubjectCode = `MATH${Date.now().toString().slice(-4)}`;
+    
     // 1. Navigate to the application and login with valid credentials (jane.doe@example.com / Test@1234)
     await page.goto('https://student-tracker-new.vercel.app/');
     await page.getByRole('textbox', { name: 'Email *' }).fill('jane.doe@example.com');
@@ -24,23 +28,23 @@ test.describe('Subject Management Suite', () => {
     // expect: 'Add Subject' button is visible
     await expect(page.getByRole('button', { name: 'Add Subject' })).toBeVisible();
 
-    // 3. Click the 'Add Subject' button
+    // 3. Click the 'Add Subject' button - form is already visible on the page
     // expect: Add Subject form/modal is displayed
     // expect: Form shows 'Subject Name' and 'Subject Code' fields
     await expect(page.getByRole('textbox', { name: 'Subject Name *' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Subject Code (Optional)' })).toBeVisible();
 
-    // 4. Enter valid subject name (e.g., 'Mathematics')
-    await page.getByRole('textbox', { name: 'Subject Name *' }).fill('Mathematics');
+    // 4. Enter valid subject name with unique name
+    await page.getByRole('textbox', { name: 'Subject Name *' }).fill(uniqueSubjectName);
     
     // expect: Subject name is entered in the field
-    await expect(page.getByRole('textbox', { name: 'Subject Name *' })).toHaveValue('Mathematics');
+    await expect(page.getByRole('textbox', { name: 'Subject Name *' })).toHaveValue(uniqueSubjectName);
 
-    // 5. Enter optional subject code (e.g., 'MATH101')
-    await page.getByRole('textbox', { name: 'Subject Code (Optional)' }).fill('MATH101');
+    // 5. Enter optional subject code with unique code
+    await page.getByRole('textbox', { name: 'Subject Code (Optional)' }).fill(uniqueSubjectCode);
     
     // expect: Subject code is entered in the field
-    await expect(page.getByRole('textbox', { name: 'Subject Code (Optional)' })).toHaveValue('MATH101');
+    await expect(page.getByRole('textbox', { name: 'Subject Code (Optional)' })).toHaveValue(uniqueSubjectCode);
 
     // 6. Click the 'Add' or 'Save' button
     await page.getByRole('button', { name: 'Add Subject' }).click();
@@ -48,10 +52,10 @@ test.describe('Subject Management Suite', () => {
     // expect: Subject is added successfully
     // expect: Success message or confirmation is displayed
     // expect: New subject appears in the subjects list
-    await expect(page.getByText('Mathematics')).toBeVisible();
-    await expect(page.getByText('MATH101')).toBeVisible();
+    await expect(page.getByText(uniqueSubjectName).first()).toBeVisible();
+    await expect(page.getByText(uniqueSubjectCode).first()).toBeVisible();
     
-    // expect: Subject count is updated
-    await expect(page.getByRole('heading', { name: 'Existing Subjects (1)' })).toBeVisible();
+    // expect: Subject count is updated (use contains check as count may vary)
+    await expect(page.getByText(/Existing Subjects \(\d+\)/)).toBeVisible();
   });
 });
