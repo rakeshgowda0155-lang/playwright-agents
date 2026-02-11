@@ -5,6 +5,9 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Student Management - Add Students Suite', () => {
   test('Add Student - Valid Student with Subjects and Marks', async ({ page }) => {
+    // Generate unique roll number for this test run
+    const uniqueRollNumber = `STU${Date.now().toString().slice(-6)}`;
+    
     // 1. Navigate to the application and login with valid credentials (jane.doe@example.com / Test@1234)
     await page.goto('https://student-tracker-new.vercel.app/');
     await page.getByRole('textbox', { name: 'Email *' }).fill('jane.doe@example.com');
@@ -46,10 +49,10 @@ test.describe('Student Management - Add Students Suite', () => {
     await expect(page.getByRole('textbox', { name: 'Full Name *' })).toHaveValue('John Smith');
     
     // 6. Enter valid roll number (e.g., 'STU001')
-    await page.getByRole('textbox', { name: 'Roll Number *' }).fill('STU001');
+    await page.getByRole('textbox', { name: 'Roll Number *' }).fill(uniqueRollNumber);
     
     // Expect: Roll number is entered in the field
-    await expect(page.getByRole('textbox', { name: 'Roll Number *' })).toHaveValue('STU001');
+    await expect(page.getByRole('textbox', { name: 'Roll Number *' })).toHaveValue(uniqueRollNumber);
     
     // 7. Enter valid password (e.g., 'Pass@1234')
     await page.getByRole('textbox', { name: 'Password *', exact: true }).fill('Pass@1234');
@@ -72,10 +75,10 @@ test.describe('Student Management - Add Students Suite', () => {
     // Expect: Student is added successfully
     // Expect: Success message is displayed
     // Expect: New student appears in the students list
-    await expect(page.getByText('John Smith')).toBeVisible();
+    await expect(page.getByText('John Smith').first()).toBeVisible();
     
     // Expect: Student details show correct information
-    await expect(page.getByText('STU001')).toBeVisible();
-    await expect(page.getByText('85%')).toBeVisible();
+    await expect(page.getByText(uniqueRollNumber)).toBeVisible();
+    await expect(page.getByText('85%').first()).toBeVisible();
   });
 });

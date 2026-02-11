@@ -5,6 +5,9 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Authentication Suite', () => {
   test('Teacher Signup - Valid Registration', async ({ page }) => {
+    // Generate unique email for this test run
+    const uniqueEmail = `jane.doe.${Date.now()}@example.com`;
+    
     // 1. Navigate to the application root URL (https://student-tracker-new.vercel.app/)
     await page.goto('https://student-tracker-new.vercel.app/');
     
@@ -26,7 +29,7 @@ test.describe('Authentication Suite', () => {
     // expect: Signup form is visible with all required fields: Full Name, Email, Password, Confirm Password
     await expect(page.getByRole('textbox', { name: 'Full Name *' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Email *' })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'Password *' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Password *', exact: true })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Confirm Password *' })).toBeVisible();
 
     // 3. Enter valid full name (e.g., 'Jane Doe')
@@ -36,10 +39,10 @@ test.describe('Authentication Suite', () => {
     await expect(page.getByRole('textbox', { name: 'Full Name *' })).toHaveValue('Jane Doe');
 
     // 4. Enter valid email (e.g., 'jane.doe@example.com')
-    await page.getByRole('textbox', { name: 'Email *' }).fill('jane.doe@example.com');
+    await page.getByRole('textbox', { name: 'Email *' }).fill(uniqueEmail);
     
     // expect: Email is entered in the text field
-    await expect(page.getByRole('textbox', { name: 'Email *' })).toHaveValue('jane.doe@example.com');
+    await expect(page.getByRole('textbox', { name: 'Email *' })).toHaveValue(uniqueEmail);
 
     // 5. Enter valid password meeting requirements (e.g., 'Test@1234')
     await page.getByRole('textbox', { name: 'Password *', exact: true }).fill('Test@1234');
@@ -66,6 +69,6 @@ test.describe('Authentication Suite', () => {
     
     // expect: User information is shown in the sidebar (name and email)
     await expect(page.getByText('Jane Doe')).toBeVisible();
-    await expect(page.getByText('jane.doe@example.com')).toBeVisible();
+    await expect(page.getByText(uniqueEmail)).toBeVisible();
   });
 });

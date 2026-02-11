@@ -24,7 +24,7 @@ test.describe('Search and Filter Suite', () => {
     await expect(page.getByRole('heading', { name: 'Students' })).toBeVisible();
     
     // Expect: Student list shows existing students
-    await expect(page.getByText('John Smith')).toBeVisible();
+    await expect(page.getByText('John Smith').first()).toBeVisible();
     
     // 4. Locate the search field (labeled 'Search by name or roll number')
     // Expect: Search field is visible
@@ -41,7 +41,7 @@ test.describe('Search and Filter Suite', () => {
     // Expect: Search results update automatically (real-time search)
     // Expect: Only students matching the search term are displayed
     // Expect: Student 'John Smith' is visible in the filtered results
-    await expect(page.getByText('John Smith')).toBeVisible();
+    await expect(page.getByText('John Smith').first()).toBeVisible();
     
     // Expect: Students not matching the search term are not visible (verify with non-matching search)
     await searchField.fill('xyz');
@@ -49,7 +49,7 @@ test.describe('Search and Filter Suite', () => {
     
     // Return to successful search
     await searchField.fill('John');
-    await expect(page.getByText('John Smith')).toBeVisible();
+    await expect(page.getByText('John Smith').first()).toBeVisible();
     
     // 7. Clear the search field
     await searchField.fill('');
@@ -58,6 +58,6 @@ test.describe('Search and Filter Suite', () => {
     await expect(searchField).toHaveValue('');
     
     // Expect: All students are displayed again
-    await expect(page.getByText('John Smith')).toBeVisible();
+    await expect(page.getByText('John Smith').first()).toBeVisible();
   });
 });
