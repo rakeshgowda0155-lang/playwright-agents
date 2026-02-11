@@ -1,0 +1,80 @@
+name: Jira Test Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      jira_issue_key:
+        description: 'Jira Issue Key (e.g., SCRUM-123)'
+        required: true
+        type: string
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - 'generate-and-test'
+          - 'test-only'
+          - 'update-jira-only'
+        default: 'generate-and-test'
+
+jobs:
+  jira-orchestration:
+    name: 🎯 Jira Test Workflow
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      
+      - name: Run Playwright Tests
+        if: inputs.action == 'generate-and-test' || inputs.action == 'test-only'
+        id: test-run
+        run: |
+          echo "Running tests for Jira issue: ${{ inputs.jira_issue_key }}"
+          npx playwright test --reporter=json,html > test-output.log 2>&1 || true
+          
+          # Parse results if json reporter created output
+          if [ -f test-results.json ]; then
+            echo "results_file=test-results.json" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+      
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ inputs.jira_issue_key }}
+          path: playwright-report/
+          retention-days: 30
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ inputs.jira_issue_key }}
+          path: test-results/
+          retention-days: 30
+      
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "## Test Execution Summary for ${{ inputs.jira_issue_key }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action:** ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Next step: Use @jira-test-orchestrator to update Jira issue with results" >> $GITHUB_STEP_SUMMARY
+
+env:
+  JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}

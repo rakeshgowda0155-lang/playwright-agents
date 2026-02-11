@@ -7,6 +7,18 @@
         "playwright",
         "run-test-mcp-server"
       ]
+    },
+    "jira-direct": {
+      "command": "npx",
+      "args": [
+        "@timbreeding/jira-mcp-server@latest",
+        "--jira-base-url=https://rakegowda015-1759229291995.atlassian.net",
+        "--jira-username=rakegowda015@gmail.com",
+        "--jira-api-token=${JIRA_API_TOKEN}"
+      ],
+      "env": {
+        "DEBUG": "true"
+      }
     }
   },
   "inputs": []
