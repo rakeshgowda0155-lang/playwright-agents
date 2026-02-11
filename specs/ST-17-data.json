@@ -1,0 +1,15 @@
+{
+  "storyId": "ST-17",
+  "summary": "User Login and Authentication",
+  "issueType": "Story",
+  "status": "To Do",
+  "description": "As a user, I want to be able to log in to the application using my credentials so that I can access my personalized dashboard.\nAcceptance Criteria:\n1. Login page should have username and password fields\n2. Valid credentials should redirect to dashboard\n3. Invalid credentials should show error message\n4. Password field should mask input\n5. Remember me checkbox should persist session",
+  "acceptanceCriteria": [
+    "Login page should have username and password fields",
+    "Valid credentials should redirect to dashboard",
+    "Invalid credentials should show error message",
+    "Password field should mask input",
+    "Remember me checkbox should persist session"
+  ],
+  "jiraUrl": "https://rakegowda015-1759229291995.atlassian.net/browse/ST-17"
+}
