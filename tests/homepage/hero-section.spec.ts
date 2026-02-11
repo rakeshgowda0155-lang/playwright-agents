@@ -1,3 +1,6 @@
+// spec: Homepage Tests
+// seed: tests/seed.spec.ts
+
 import { test, expect } from '@playwright/test';
 
 test.describe('Homepage Tests', () => {
