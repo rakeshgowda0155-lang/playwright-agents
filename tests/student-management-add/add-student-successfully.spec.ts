@@ -26,7 +26,8 @@ test.describe('Student Management - Add', () => {
     // expect: Form displays fields: Name, Roll Number, Email, Phone, Password, Photo URL
     await expect(page.getByRole('textbox', { name: 'Full Name *' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Roll Number *' })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'Password *' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Password *', exact: true })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Confirm Password *' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Photo (Optional)' })).toBeVisible();
 
     // expect: At least one Subject section is visible with Subject Name and Marks fields
@@ -34,14 +35,16 @@ test.describe('Student Management - Add', () => {
     await expect(page.getByRole('spinbutton', { name: 'Marks (0-100) *' })).toBeVisible();
 
     // 3. Enter student information
+    // Generate unique roll number using timestamp to avoid conflicts
+    const uniqueRollNumber = `ST${Date.now().toString().slice(-6)}`;
     await page.getByRole('textbox', { name: 'Full Name *' }).fill('John Doe');
-    await page.getByRole('textbox', { name: 'Roll Number *' }).fill('ST1005');
+    await page.getByRole('textbox', { name: 'Roll Number *' }).fill(uniqueRollNumber);
     await page.getByRole('textbox', { name: 'Password *', exact: true }).fill('JohnPass123!');
     await page.getByRole('textbox', { name: 'Confirm Password *' }).fill('JohnPass123!');
 
     // expect: All fields accept the input
     await expect(page.getByRole('textbox', { name: 'Full Name *' })).toHaveValue('John Doe');
-    await expect(page.getByRole('textbox', { name: 'Roll Number *' })).toHaveValue('ST1005');
+    await expect(page.getByRole('textbox', { name: 'Roll Number *' })).toHaveValue(uniqueRollNumber);
     await expect(page.getByRole('textbox', { name: 'Password *', exact: true })).toHaveValue('JohnPass123!');
 
     // 4. Enter subject information
@@ -58,10 +61,14 @@ test.describe('Student Management - Add', () => {
     await page.getByText("Loading...").first().waitFor({ state: 'hidden' });
 
     // expect: Success message 'Student added successfully' is displayed
+    await expect(page.getByText('Student added successfully')).toBeVisible();
+    
     // expect: User is redirected to the Students List page
     await expect(page.getByRole('heading', { name: 'Students' })).toBeVisible();
 
-    // expect: New student 'John Doe' appears in the list
-    await expect(page.getByText('John Doe')).toBeVisible();
+    // expect: New student appears in the list with the unique roll number
+    await expect(page.getByText(uniqueRollNumber)).toBeVisible();
+    // Verify the student name is also present
+    await expect(page.getByText('John Doe').first()).toBeVisible();
   });
 });
