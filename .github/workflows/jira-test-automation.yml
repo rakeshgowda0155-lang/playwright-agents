@@ -21,6 +21,8 @@ jobs:
   jira-orchestration:
     name: 🎯 Jira Test Workflow
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - uses: actions/checkout@v4
